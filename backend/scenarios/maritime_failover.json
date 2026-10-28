@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "name": "Maritime Failover",
+    "description": "Synthetic example scenario: a vessel with terrestrial cellular primary link and satellite backup link. All link values are invented example numbers for UI/simulation development, NOT measured real-world performance.",
+    "synthetic": true
+  },
+  "nodes": [
+    {
+      "id": "ship-1",
+      "type": "ship",
+      "label": "Vessel MV Nexus",
+      "position": { "x": 80, "y": 220 },
+      "properties": { "role": "mobile endpoint", "note": "synthetic example" }
+    },
+    {
+      "id": "base-station-1",
+      "type": "base_station",
+      "label": "Coastal Base Station",
+      "position": { "x": 360, "y": 80 },
+      "properties": { "role": "terrestrial access", "note": "synthetic example" }
+    },
+    {
+      "id": "satellite-1",
+      "type": "satellite",
+      "label": "GEO Satellite",
+      "position": { "x": 360, "y": 360 },
+      "properties": { "orbit": "GEO (fictional)", "note": "synthetic example" }
+    },
+    {
+      "id": "sat-gateway-1",
+      "type": "gateway",
+      "label": "Satellite Gateway",
+      "position": { "x": 640, "y": 360 },
+      "properties": { "role": "teleport", "note": "synthetic example" }
+    },
+    {
+      "id": "internet-1",
+      "type": "internet",
+      "label": "Internet",
+      "position": { "x": 640, "y": 80 },
+      "properties": { "role": "endpoint", "note": "synthetic example" }
+    }
+  ],
+  "links": [
+    {
+      "id": "link-ship-cellular",
+      "source": "ship-1",
+      "target": "base-station-1",
+      "label": "Primary",
+      "latency_ms": 35,
+      "bandwidth_mbps": 50,
+      "reliability": 0.92,
+      "status": "active",
+      "technology": "Cellular (LTE)"
+    },
+    {
+      "id": "link-ship-sat",
+      "source": "ship-1",
+      "target": "satellite-1",
+      "label": "Backup",
+      "latency_ms": 600,
+      "bandwidth_mbps": 20,
+      "reliability": 0.98,
+      "status": "standby",
+      "technology": "VSAT (GEO)"
+    },
+    {
+      "id": "link-sat-feeder",
+      "source": "satellite-1",
+      "target": "sat-gateway-1",
+      "label": "Feeder",
+      "latency_ms": 250,
+      "bandwidth_mbps": 100,
+      "reliability": 0.99,
+      "status": "active",
+      "technology": "Ka-band feeder"
+    },
+    {
+      "id": "link-gateway-internet",
+      "source": "sat-gateway-1",
+      "target": "internet-1",
+      "label": "Backhaul",
+      "latency_ms": 5,
+      "bandwidth_mbps": 1000,
+      "reliability": 0.999,
+      "status": "active",
+      "technology": "Fiber"
+    },
+    {
+      "id": "link-cellular-internet",
+      "source": "base-station-1",
+      "target": "internet-1",
+      "label": "Backhaul",
+      "latency_ms": 10,
+      "bandwidth_mbps": 1000,
+      "reliability": 0.995,
+      "status": "active",
+      "technology": "Fiber"
+    }
+  ]
+}
