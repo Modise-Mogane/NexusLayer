@@ -33,7 +33,7 @@ export default function StatusBar() {
   }, []);
 
   const dot =
-    state === "online" ? "bg-emerald-500" : state === "offline" ? "bg-red-500" : "bg-amber-400";
+    state === "online" ? "bg-nx-ok" : state === "offline" ? "bg-nx-bad" : "bg-nx-warn";
   const label =
     state === "online"
       ? `Backend connected${service ? ` · ${service}` : ""}`
@@ -42,9 +42,9 @@ export default function StatusBar() {
         : "Checking backend…";
 
   return (
-    <footer className="flex h-8 shrink-0 items-center gap-2 border-t border-slate-200 bg-white px-4">
+    <footer className="flex h-8 shrink-0 items-center gap-2 border-t border-nx-line bg-nx-panel px-4">
       <span className={`h-2 w-2 rounded-full ${dot}`} aria-hidden />
-      <span className="text-[11px] text-slate-600">{label}</span>
+      <span className="font-mono text-[11px] text-nx-muted">{label}</span>
     </footer>
   );
 }

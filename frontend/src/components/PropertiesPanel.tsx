@@ -1,6 +1,7 @@
 "use client";
 
 import type { Selection } from "@/components/TopologyCanvas";
+import type { SimulationState } from "@/lib/api";
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -11,9 +12,24 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-export default function PropertiesPanel({ selection }: { selection: Selection | null }) {
+export default function PropertiesPanel({
+  selection,
+  sim,
+}: {
+  selection: Selection | null;
+  sim: SimulationState | null;
+}) {
+  const linkState =
+    selection?.kind === "edge" && selection.edge
+      ? sim?.links.find((l) => l.id === selection.edge!.id)
+      : undefined;
+  const nodeState =
+    selection?.kind === "node" && selection.node
+      ? sim?.nodes.find((n) => n.id === selection.node!.id)
+      : undefined;
+
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-l border-slate-200 bg-white">
+    <div className="flex min-h-0 flex-1 flex-col">
       <div className="border-b border-slate-200 px-4 py-2.5">
         <h2 className="text-xs font-semibold text-slate-900">Properties</h2>
       </div>
@@ -31,9 +47,28 @@ export default function PropertiesPanel({ selection }: { selection: Selection | 
               {selection.node.type.replace("_", " ")}
             </p>
             <Row label="ID" value={selection.node.id} />
+            {nodeState && (
+              <>
+                <Row label="Operational" value={nodeState.status} />
+                <Row label="Reachable" value={nodeState.reachable ? "yes" : "no"} />
+                <Row label="On active route" value={nodeState.on_active_route ? "yes" : "no"} />
+              </>
+            )}
             {Object.entries(selection.node.properties ?? {}).map(([k, v]) => (
               <Row key={k} label={k} value={String(v)} />
             ))}
+            {nodeState && nodeState.interfaces.length > 0 && (
+              <div className="mt-2">
+                <p className="mb-1 text-[11px] font-medium text-slate-700">Interfaces</p>
+                {nodeState.interfaces.map((iface) => (
+                  <Row
+                    key={iface.link_id}
+                    label={iface.technology}
+                    value={`→ ${iface.neighbor_id}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
         {selection?.kind === "edge" && selection.edge && (
@@ -43,7 +78,16 @@ export default function PropertiesPanel({ selection }: { selection: Selection | 
             </h3>
             <p className="mb-2 text-[11px] uppercase tracking-wide text-slate-500">Link</p>
             <Row label="Technology" value={selection.edge.technology} />
-            <Row label="Status" value={selection.edge.status} />
+            <Row label="Scenario status" value={selection.edge.status} />
+            {linkState && (
+              <>
+                <Row label="Operational" value={linkState.status} />
+                <Row
+                  label="On active route"
+                  value={linkState.on_active_route ? "yes" : "no"}
+                />
+              </>
+            )}
             <Row label="Latency" value={`${selection.edge.latency_ms} ms`} />
             <Row label="Bandwidth" value={`${selection.edge.bandwidth_mbps} Mbps`} />
             <Row label="Reliability" value={String(selection.edge.reliability)} />
@@ -53,6 +97,6 @@ export default function PropertiesPanel({ selection }: { selection: Selection | 
           </div>
         )}
       </div>
-    </aside>
+    </div>
   );
 }

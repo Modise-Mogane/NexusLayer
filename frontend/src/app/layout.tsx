@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
+import "@fontsource/ibm-plex-sans/400.css";
+import "@fontsource/ibm-plex-sans/500.css";
+import "@fontsource/ibm-plex-sans/600.css";
+import "@fontsource/ibm-plex-sans/700.css";
+import "@fontsource/ibm-plex-mono/400.css";
+import "@fontsource/ibm-plex-mono/500.css";
 import "./globals.css";
+import AssistantProvider from "@/components/assistant/AssistantProvider";
 
 export const metadata: Metadata = {
   title: "NexusLayer",
@@ -13,7 +20,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="h-screen bg-slate-100 text-slate-900">{children}</body>
+      <body className="h-screen bg-nx-workspace font-sans text-nx-ink">
+        {/* Shell-level assistant: conversations and voice survive route changes. */}
+        <AssistantProvider>{children}</AssistantProvider>
+      </body>
     </html>
   );
 }

@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: light;
+  /* Motion tokens: one family of durations/easing for the whole product. */
+  --nx-dur-instant: 90ms;
+  --nx-dur-fast: 150ms;
+  --nx-dur-med: 220ms;
+  --nx-ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --nx-ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
 html,
 body,
 #__next {
@@ -10,6 +20,235 @@ body,
 
 body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+  background: #e8eff3;
+  color: #142f40;
+  font-feature-settings: "tnum" 0, "lnum" 1;
+  transition: background-color var(--nx-dur-med) var(--nx-ease-out);
+}
+
+/* NexusLayer shared primitives (see DESIGN_SYSTEM.md).
+   Hierarchy comes from spacing, type, and subtle surface contrast. */
+@layer components {
+  .nx-panel {
+    @apply rounded-md border border-nx-line bg-nx-panel;
+  }
+  .nx-btn-primary {
+    @apply rounded bg-nx-accent px-3 py-1.5 text-xs font-semibold text-nx-workspace hover:bg-nx-accentdim disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .nx-btn-ghost {
+    @apply rounded border border-nx-line bg-nx-raised px-2.5 py-1 text-xs text-nx-body hover:border-nx-accent disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .nx-field {
+    @apply w-full rounded-md border border-nx-line bg-nx-raised px-2.5 py-1.5 text-xs text-nx-ink placeholder:text-nx-muted focus:border-nx-accent focus:outline-none focus:ring-1 focus:ring-nx-accent/40;
+  }
+  .nx-label {
+    @apply font-mono text-[11px] font-semibold uppercase tracking-wider text-nx-muted;
+  }
+  .nx-note-ok {
+    @apply rounded bg-nx-ok/10 px-3 py-2 text-xs text-nx-ok;
+  }
+  .nx-note-info {
+    @apply rounded bg-nx-accent/10 px-3 py-2 text-xs text-nx-accent;
+  }
+  .nx-note-warn {
+    @apply rounded bg-nx-warn/10 px-3 py-2 text-xs text-nx-warn;
+  }
+  .nx-note-bad {
+    @apply rounded bg-nx-bad/10 px-3 py-2 text-xs text-nx-badink;
+  }
+}
+
+/* React Flow controls follow the surrounding workspace. */
+.react-flow__controls {
+  background: #f8fafb;
+  border: 1px solid #ccd9df;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: none;
+}
+.react-flow__controls-button {
+  background: #f8fafb;
+  border-bottom: 1px solid #ccd9df;
+  fill: #355160;
+}
+.react-flow__controls-button:hover {
+  background: #e8eff3;
+}
+.react-flow__attribution {
+  background: transparent;
+  color: #5d7380;
+}
+
+/* Technical stages retain a deeper surface for visual focus. */
+.nx-darkstage {
+  background: #142a3e;
+  color: #e8e6e1;
+}
+.nx-darkstage .react-flow__controls {
+  background: #203c54;
+  border-color: #36566d;
+}
+.nx-darkstage .react-flow__controls-button {
+  background: #203c54;
+  border-bottom-color: #36566d;
+  fill: #c9d1d9;
+}
+.nx-darkstage .react-flow__controls-button:hover {
+  background: #2b4d67;
+}
+.nx-darkstage .react-flow__attribution {
+  color: #8b949e;
+}
+.react-flow__edge.selectable:focus {
+  outline: none;
+}
+
+/* Visible focus for keyboard users. */
+:focus-visible {
+  outline: 2px solid #0b7465;
+  outline-offset: 1px;
+}
+.nx-darkstage :focus-visible {
+  outline-color: #0b7465;
+}
+
+/* NexusLayer motion system (Stage C1): purposeful, state-driven, restrained.
+   Panels slide, inspector content swaps, live telemetry pulses. Decorative
+   infinite motion is out; every animation below signals a state change. */
+@keyframes nx-slide-in-left {
+  from { transform: translateX(-12px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes nx-slide-in-right {
+  from { transform: translateX(12px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes nx-fade-swap {
+  from { transform: translateY(3px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes nx-pop {
+  from { transform: scale(0.97) translateY(-2px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+@keyframes nx-live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@keyframes nx-wave-bar {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+@keyframes nx-shimmer {
+  from { background-position: -200px 0; }
+  to { background-position: 200px 0; }
+}
+@keyframes nx-drawer-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.nx-panel-left { animation: nx-slide-in-left var(--nx-dur-fast) var(--nx-ease-out); }
+.nx-panel-right { animation: nx-slide-in-right var(--nx-dur-fast) var(--nx-ease-out); }
+.nx-swap { animation: nx-fade-swap var(--nx-dur-fast) var(--nx-ease-out); }
+.nx-pop { animation: nx-pop var(--nx-dur-fast) var(--nx-ease-spring); }
+.nx-drawer { animation: nx-drawer-in var(--nx-dur-med) var(--nx-ease-out); }
+/* Route views settle in once; canvas/device selection answers instantly. */
+@keyframes nx-view-in {
+  from { transform: translateY(6px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.nx-view { animation: nx-view-in var(--nx-dur-med) var(--nx-ease-out); }
+@keyframes nx-select-ring {
+  0% { box-shadow: 0 0 0 0 rgba(131, 216, 164, 0.45); }
+  100% { box-shadow: 0 0 0 6px rgba(131, 216, 164, 0); }
+}
+.nx-select-ring { animation: nx-select-ring 320ms var(--nx-ease-out); }
+@keyframes nx-toast-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.nx-toast { animation: nx-toast-in var(--nx-dur-med) var(--nx-ease-out); }
+.nx-live-dot { animation: nx-live-pulse 1.6s ease-in-out infinite; }
+.nx-wave-bar {
+  transform-origin: center;
+  animation: nx-wave-bar 0.9s ease-in-out infinite;
+}
+.nx-shimmer {
+  background: linear-gradient(90deg, #e8eff3 25%, #f8fafb 50%, #e8eff3 75%);
+  background-size: 400px 100%;
+  animation: nx-shimmer 1.4s linear infinite;
+}
+
+/* Physics Lab L1 motion: signal flow along paths, radiating wavefronts,
+   guided photons. All state-driven; the global reduced-motion rule stills
+   every one of them. */
+@keyframes nx-dash-flow {
+  to { stroke-dashoffset: -28; }
+}
+@keyframes nx-ping {
+  0% { transform: scale(0.4); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+@keyframes nx-photon {
+  0% { offset-distance: 0%; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+.nx-flow {
+  stroke-dasharray: 6 8;
+  animation: nx-dash-flow 1s linear infinite;
+}
+.nx-ping {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: nx-ping 2.2s ease-out infinite;
+}
+.nx-photon {
+  offset-rotate: 0deg;
+  animation: nx-photon 2.4s linear infinite;
+}
+
+/* Styled range input for NxSlider. */
+.nx-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: #ccd9df;
+  outline-offset: 4px;
+  cursor: pointer;
+}
+.nx-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #f8fafb;
+  border: 2px solid #0b7465;
+  box-shadow: none;
+}
+.nx-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #f8fafb;
+  border: 2px solid #0b7465;
+  box-shadow: none;
+}
+.nx-range::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: #ccd9df;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
